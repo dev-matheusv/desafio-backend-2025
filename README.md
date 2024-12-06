@@ -3,7 +3,7 @@
 ## Definições
 
 - Leia todo o conteúdo antes de iniciar e busque entender de fato o desafio proposto.
-- Faça o fork desse repositório para iniciar o projeto. Lembre-se de deixar o seu repositório privado e compartilhar com a conta do GitHub [MarcosVRSDev](https://github.com/MarcosVRSDev).
+- Faça um clone desse repositório para iniciar o projeto. Lembre-se de deixar o seu repositório privado e compartilhar com a conta do GitHub [MarcosVRSDev](https://github.com/MarcosVRSDev).
 - Utilizar o .Net na sua versão 5 ou superior.
 
 ## Desafio
