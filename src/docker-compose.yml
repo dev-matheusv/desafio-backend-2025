@@ -6,8 +6,8 @@ services:
     container_name: oxsbank_db
     restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Oxossi96
       POSTGRES_DB: oxsbankdb
     ports:
       - "5432:5432"
@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=oxsbankdb;Username=admin;Password=admin"
+      ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=oxsbankdb;Username=postgres;Password=Oxossi96"
     ports:
       - "5000:5000"
       - "5001:5001"

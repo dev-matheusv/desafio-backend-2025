@@ -1,0 +1,16 @@
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\bin\Debug\net8.0\OxsBank.Application.deps.json
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\bin\Debug\net8.0\OxsBank.Application.dll
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\bin\Debug\net8.0\OxsBank.Application.pdb
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\bin\Debug\net8.0\OxsBank.Domain.dll
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\bin\Debug\net8.0\OxsBank.Domain.pdb
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.csproj.AssemblyReference.cache
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.AssemblyInfoInputs.cache
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.AssemblyInfo.cs
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.csproj.CoreCompileInputs.cache
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.sourcelink.json
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank..39BF545B.Up2Date
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.dll
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\refint\OxsBank.Application.dll
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\OxsBank.Application.pdb
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Application\obj\Debug\net8.0\ref\OxsBank.Application.dll
