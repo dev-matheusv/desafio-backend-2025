@@ -2,20 +2,31 @@ using Microsoft.EntityFrameworkCore;
 using OxsBank.Application.Interfaces;
 using OxsBank.Application.Models;
 using OxsBank.Domain.Entities;
+using OxsBank.Infrastructure.Configurations;
 using OxsBank.Infrastructure.Persistence;
 
 namespace OxsBank.Infrastructure.Services;
 
-public class AccountService(OxsBankDbContext context) : IAccountService
+public class AccountService(OxsBankDbContext context, IReceitaWsService receitaWsService) : IAccountService
 {
     private readonly OxsBankDbContext _context = context;
+    private readonly IReceitaWsService _receitaWsService = receitaWsService;
 
     public async Task<AccountModels.Account> CreateAccountAsync(AccountModels.CreateAccount model)
     {
+        var formattedCnpj = CnpjConfiguration.FormatCnpj(model.Cnpj);
+        
+        if (_context.Accounts.Any(a => a.Cnpj == formattedCnpj))
+            throw new Exception("CNPJ já cadastrado");
+        
+        var companyName = await _receitaWsService.GetCompanyName(model.Cnpj);
+        if (string.IsNullOrEmpty(companyName))
+            throw new Exception("CNPJ inválido ou não encontrado");
+        
         var account = new Account
         {
             Id = Guid.NewGuid(),
-            Cnpj = model.Cnpj,
+            Cnpj = formattedCnpj,
             DocumentImage = $"uploads/{Guid.NewGuid()}.png"
         };
         
@@ -25,23 +36,23 @@ public class AccountService(OxsBankDbContext context) : IAccountService
         return new AccountModels.Account
         {
             Id = account.Id,
-            Name = "Empresa Teste",
+            Name = companyName,
             Cnpj = account.Cnpj,
-            AccountNumber = account.AccountNumber,
-            Agency = account.Agency,
+            AccountNumber = new Random().Next(100000000, 999999999).ToString(),
+            Agency = "0001",
             DocumentImage = account.DocumentImage
         };
     }
 
-    public async Task<AccountModels.Account> GetAccountByIdAsync(Guid id)
+    public async Task<AccountModels.Account> GetAccountByIdAsync(Guid accountId)
     {
-        var account = await _context.Accounts.FindAsync(id);
+        var account = await _context.Accounts.FindAsync(accountId);
         if (account == null) return null!;
 
         return new AccountModels.Account
         {
             Id = account.Id,
-            Name = "Empresa Teste",
+            Name = account.Name,
             Cnpj = account.Cnpj,
             AccountNumber = account.AccountNumber,
             Agency = account.Agency,
@@ -54,7 +65,7 @@ public class AccountService(OxsBankDbContext context) : IAccountService
         return await _context.Accounts.Select(a => new AccountModels.Account
         {
             Id = a.Id,
-            Name = "Empresa Teste",
+            Name = a.Name,
             Cnpj = a.Cnpj,
             AccountNumber = a.AccountNumber,
             Agency = a.Agency,
@@ -62,9 +73,9 @@ public class AccountService(OxsBankDbContext context) : IAccountService
         }).ToListAsync();
     }
 
-    public async Task<bool> DeleteAccountAsync(Guid id)
+    public async Task<bool> DeleteAccountAsync(Guid accountId)
     {
-        var account = await _context.Accounts.FindAsync(id);
+        var account = await _context.Accounts.FindAsync(accountId);
         if (account == null) return false;
         
         _context.Accounts.Remove(account);

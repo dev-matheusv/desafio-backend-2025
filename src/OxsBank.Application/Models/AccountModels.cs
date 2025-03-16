@@ -22,5 +22,7 @@ public abstract class AccountModels
         public string AccountNumber { get; set; } = null!;
         public string Agency { get; set; } = null!;
         public string DocumentImage { get; set; } = null!;    
+        
+        public decimal Balance { get; set; } = 0;
     }
 }

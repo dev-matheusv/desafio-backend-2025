@@ -25,4 +25,7 @@ public class Transaction
 
     [ForeignKey("DestinationAccountId")]
     public Account? DestinationAccount { get; set; }
+    
+    [Required]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Data de criação
 }

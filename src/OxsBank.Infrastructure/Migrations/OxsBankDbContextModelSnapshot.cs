@@ -74,6 +74,9 @@ namespace OxsBank.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid?>("DestinationAccountId")
                         .HasColumnType("uuid");
 
