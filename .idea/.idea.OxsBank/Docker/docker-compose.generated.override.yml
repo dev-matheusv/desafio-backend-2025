@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  api:
+    build:
+      context: "C:\\Projeto_OxsBank\\desafio-backend-2025\\src"
+      dockerfile: "OxsBank.API/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app-1/bin/Debug/net8.0/OxsBank.API.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "oxsbank.api:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\devma\\.nuget\\packages:/root/.nuget/packages"
+    - "C:\\Projeto_OxsBank\\desafio-backend-2025\\src\\OxsBank.API:/app-1:rw"
+    - "C:\\Projeto_OxsBank\\desafio-backend-2025:/src:rw"
+    working_dir: "/app-1"

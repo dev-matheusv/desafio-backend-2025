@@ -1,0 +1,61 @@
+# Rider / JetBrains IDE
+.idea/
+*.iml
+/shelf/
+/workspace.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/modules.xml
+
+# Visual Studio / .NET
+bin/
+obj/
+.vscode/
+.vs/
+*.user
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+*.csproj.user
+
+# Configurações de ambiente
+.env
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Test.json
+
+# Logs e Debug
+logs/
+*.log
+*.tlog
+*.dmp
+
+# Arquivos temporários do sistema
+Thumbs.db
+.DS_Store
+*.bak
+*.swp
+
+# Docker
+docker-compose.override.yml
+**/data/
+**/pgdata/
+node_modules/
+
+# Banco de Dados e Migrations
+migrations/
+db.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+*.bak
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Datasource local storage ignored files
+/dataSources/
+dataSources.local.xml
+

@@ -1,10 +1,28 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace OxsBank.Domain.Entities;
 
 public class Transaction
 {
-    public int Id { get; set; }
-    public decimal Value { get; set; }
-    public string Type { get; set; } = null!; // Saque, Depósito, Transferência
-    public int AccountId { get; set; }
+    [Key]
+    public Guid Id { get; set; } = Guid.NewGuid();
+    
+    [Required]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Amount { get; set; }
+    
+    [Required]
+    public string Type { get; set; } = null!; // "Deposit", "Withdraw", "Transfer"
+    
+    [Required]
+    public Guid AccountId { get; set; }
+    
+    [ForeignKey("AccountId")]
     public Account Account { get; set; } = null!;
+    
+    public Guid? DestinationAccountId { get; set; } // Para transferências
+
+    [ForeignKey("DestinationAccountId")]
+    public Account? DestinationAccount { get; set; }
 }

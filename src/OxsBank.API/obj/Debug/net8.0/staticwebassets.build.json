@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "9iKMC009kg8/7g7VWuVryD97mppDJoK2ZzY2Sq94AEA=",
+  "Source": "OxsBank.API",
+  "BasePath": "_content/OxsBank.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -2,7 +2,9 @@ C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Infrastructure.runtimeconfig.json
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Infrastructure.dll
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Infrastructure.pdb
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Application.dll
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Domain.dll
+C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Application.pdb
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\bin\Debug\net8.0\OxsBank.Domain.pdb
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\obj\Debug\net8.0\OxsBank.Infrastructure.csproj.AssemblyReference.cache
 C:\Projeto_OxsBank\desafio-backend-2025\src\OxsBank.Infrastructure\obj\Debug\net8.0\OxsBank.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig

@@ -1,9 +1,12 @@
+using OxsBank.Application.Interfaces;
 using OxsBank.Infrastructure.Configurations;
+using OxsBank.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Adiciona os serviços do banco de dados
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
