@@ -14,9 +14,8 @@ public class AccountService(OxsBankDbContext context, IReceitaWsService receitaW
 
     public async Task<AccountModels.Account> CreateAccountAsync(AccountModels.CreateAccount model)
     {
-        var formattedCnpj = CnpjConfiguration.FormatCnpj(model.Cnpj);
         
-        if (_context.Accounts.Any(a => a.Cnpj == formattedCnpj))
+        if (_context.Accounts.Any(a => a.Cnpj == model.Cnpj))
             throw new Exception("CNPJ já cadastrado");
         
         var companyName = await _receitaWsService.GetCompanyName(model.Cnpj);
@@ -26,7 +25,10 @@ public class AccountService(OxsBankDbContext context, IReceitaWsService receitaW
         var account = new Account
         {
             Id = Guid.NewGuid(),
-            Cnpj = formattedCnpj,
+            Name = companyName,
+            Cnpj = model.Cnpj,
+            AccountNumber = new Random().Next(100000000, 999999999).ToString(),
+            Agency = "0001",
             DocumentImage = $"uploads/{Guid.NewGuid()}.png"
         };
         
@@ -36,10 +38,10 @@ public class AccountService(OxsBankDbContext context, IReceitaWsService receitaW
         return new AccountModels.Account
         {
             Id = account.Id,
-            Name = companyName,
+            Name = account.Name,
             Cnpj = account.Cnpj,
-            AccountNumber = new Random().Next(100000000, 999999999).ToString(),
-            Agency = "0001",
+            AccountNumber = account.AccountNumber,
+            Agency = account.Agency,
             DocumentImage = account.DocumentImage
         };
     }

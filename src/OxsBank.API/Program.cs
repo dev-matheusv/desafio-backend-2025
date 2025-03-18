@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReceitaWsService, ReceitaWsService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+
 builder.Services.AddHttpClient();
 
 builder.Services.AddControllers();

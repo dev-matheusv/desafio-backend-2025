@@ -1,25 +1,4 @@
-# Rider / JetBrains IDE
-.idea/
-*.iml
-/shelf/
-/workspace.xml
-/contentModel.xml
-/projectSettingsUpdater.xml
-/modules.xml
-
-# Visual Studio / .NET
-bin/
-obj/
-.vscode/
-.vs/
-*.user
-*.suo
-*.ntvs*
-*.njsproj
-*.sln.docstates
-*.csproj.user
-
-# Configurações de ambiente
+# Configurações sensíveis
 .env
 secrets.json
 appsettings.Development.json
@@ -42,15 +21,13 @@ Thumbs.db
 docker-compose.override.yml
 **/data/
 **/pgdata/
-node_modules/
 
 # Banco de Dados e Migrations
 migrations/
-db.sqlite
-*.sqlite3
-*.mdf
-*.ldf
 *.bak
+
+# Configurações específicas do JetBrains Rider
+.idea/
 
 # Editor-based HTTP Client requests
 /httpRequests/
@@ -58,4 +35,3 @@ db.sqlite
 # Datasource local storage ignored files
 /dataSources/
 dataSources.local.xml
-

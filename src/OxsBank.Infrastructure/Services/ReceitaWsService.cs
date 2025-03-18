@@ -5,7 +5,7 @@ namespace OxsBank.Infrastructure.Services;
 
 public class ReceitaWsService(HttpClient httpClient) : IReceitaWsService
 {
-    private const string ReceitaWsUrl = "https://api.receitaws.com.br/v1/cnpj";  // URL da API ReceitaWS
+    private const string ReceitaWsUrl = "https://receitaws.com.br/v1/cnpj";  // URL da API ReceitaWS
 
     public async Task<string?> GetCompanyName(string cnpj)
     {

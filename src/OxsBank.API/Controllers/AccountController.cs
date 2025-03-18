@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OxsBank.Application.Interfaces;
 using OxsBank.Application.Models;
+using OxsBank.Infrastructure.Configurations;
 
 namespace OxsBank.API.Controllers;
 
@@ -13,6 +14,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
     {
         try
         {
+            model.Cnpj = CnpjConfiguration.FormatCnpj(model.Cnpj);
             var newAccount = await accountService.CreateAccountAsync(model);
             return Ok(new { Message = "Conta criada com sucesso!", AccountId = newAccount.Id });
         }

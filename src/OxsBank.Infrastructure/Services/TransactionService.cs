@@ -8,12 +8,10 @@ namespace OxsBank.Infrastructure.Services;
 
 public class TransactionService(OxsBankDbContext context) : ITransactionService
 {
-    private readonly OxsBankDbContext _context = context;
-    
     // Método de Saque
     public async Task<bool> WithdrawAccountAsync(Guid accountId, decimal amount)
     {
-        var account = await _context.Accounts.FindAsync(accountId);
+        var account = await context.Accounts.FindAsync(accountId);
         if (account == null) return false;
         
         if (account.Balance < amount) return false; // verifica se o saldo é suficiente
@@ -27,8 +25,8 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
             AccountId = account.Id,
         };
         
-        _context.Transactions.Add(transaction);
-        await _context.SaveChangesAsync();
+        context.Transactions.Add(transaction);
+        await context.SaveChangesAsync();
 
         return true;
     }
@@ -36,7 +34,7 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
     // Método de Depósito
     public async Task<bool> DepositAccountAsync(Guid accountId, decimal amount)
     {
-        var account = await _context.Accounts.FindAsync(accountId);
+        var account = await context.Accounts.FindAsync(accountId);
         if (account == null) return false;
         
         account.Balance += amount;
@@ -48,8 +46,8 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
             AccountId = account.Id,
         };
         
-        _context.Transactions.Add(transaction);
-        await _context.SaveChangesAsync();
+        context.Transactions.Add(transaction);
+        await context.SaveChangesAsync();
         
         return true;
     }
@@ -57,12 +55,12 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
     // Método de transferência
     public async Task<bool> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId, decimal amount)
     {
-        using (var transaction = await _context.Database.BeginTransactionAsync())
+        using (var transaction = await context.Database.BeginTransactionAsync())
         {
             try
             {
-                var sourceAccount = await _context.Accounts.FindAsync(sourceAccountId);
-                var destinationAccount = await _context.Accounts.FindAsync(destinationAccountId);
+                var sourceAccount = await context.Accounts.FindAsync(sourceAccountId);
+                var destinationAccount = await context.Accounts.FindAsync(destinationAccountId);
 
                 if (sourceAccount == null || destinationAccount == null) return false;
                 if (sourceAccount.Balance < amount) return false; // Verifica se o saldo é suficiente
@@ -88,10 +86,10 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
                     DestinationAccountId = sourceAccountId
                 };
 
-                _context.Transactions.Add(transactionSource);
-                _context.Transactions.Add(transactionDestination);
+                context.Transactions.Add(transactionSource);
+                context.Transactions.Add(transactionDestination);
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return true;
@@ -107,7 +105,7 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
     // Método de Extrato
     public async Task<List<TransactionModels>> GetStatementAsync(Guid accountId)
     {
-        var transactions = await _context.Transactions
+        var transactions = await context.Transactions
             .Where(t => t.AccountId == accountId || t.DestinationAccountId == accountId)
             .ToListAsync();
 
