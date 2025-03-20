@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OxsBank.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0728e0e28052102742b93d57831878a8aa82c0db")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13011eb860ec0b3953074602d156446454770f2d")]
 [assembly: System.Reflection.AssemblyProductAttribute("OxsBank.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OxsBank.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

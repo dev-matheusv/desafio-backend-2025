@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using OxsBank.Application.DTOs;
 using OxsBank.Application.Interfaces;
-using OxsBank.Application.Models;
 using OxsBank.Infrastructure.Configurations;
 
 namespace OxsBank.API.Controllers;
@@ -10,12 +10,12 @@ namespace OxsBank.API.Controllers;
 public class AccountController(IAccountService accountService) : ControllerBase
 {
     [HttpPost("create")]
-    public async Task<IActionResult> CreateAccountAsync([FromBody] AccountModels.CreateAccount model)
+    public async Task<IActionResult> CreateAccountAsync([FromBody] AccountDto.CreateAccount dto)
     {
         try
         {
-            model.Cnpj = CnpjConfiguration.FormatCnpj(model.Cnpj);
-            var newAccount = await accountService.CreateAccountAsync(model);
+            dto.Cnpj = CnpjConfiguration.FormatCnpj(dto.Cnpj);
+            var newAccount = await accountService.CreateAccountAsync(dto);
             return Ok(new { Message = "Conta criada com sucesso!", AccountId = newAccount.Id });
         }
         catch (Exception ex)
@@ -27,21 +27,35 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAccountById(Guid id)
     {
-        var result = await accountService.GetAccountByIdAsync(id);
-        return Ok(result);
+        try
+        {
+            var result = await accountService.GetAccountByIdAsync(id);
+            return Ok(new { Message = $"A consulta foi concluída com sucesso!", result });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllAccounts()
     {
         var result = await accountService.GetAllAccountsAsync();
-        return Ok(result);
+        return Ok(new { Message = $"A consulta foi concluída com sucesso!", result });
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAccount(Guid id)
     {
-        var success = await accountService.DeleteAccountAsync(id);
-        return success ? NoContent() : NotFound();
+        try
+        {
+            var success = await accountService.DeleteAccountAsync(id);
+            return Ok(new { Message = "Conta deletada com sucesso!" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

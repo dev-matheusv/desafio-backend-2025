@@ -1,11 +1,12 @@
-using OxsBank.Application.Models;
+using System.Data.SqlTypes;
+using OxsBank.Application.DTOs;
 
 namespace OxsBank.Application.Interfaces;
 
 public interface ITransactionService
 {
-    Task<bool> WithdrawAccountAsync(Guid accountId, decimal amount);
-    Task<bool> DepositAccountAsync(Guid accountId, decimal amount);
-    Task<bool> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId, decimal amount);
-    Task<List<TransactionModels>> GetStatementAsync(Guid accountId);
+    Task<decimal> WithdrawAccountAsync(Guid accountId, decimal amount);
+    Task<decimal> DepositAccountAsync(Guid accountId, decimal amount);
+    Task<(decimal sourceBalance, decimal destinationBalance)> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId, decimal amount);
+    Task<List<TransactionDto>> GetStatementAsync(Guid accountId);
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using OxsBank.Application.Interfaces;
-using OxsBank.Infrastructure.Persistence;
 
 namespace OxsBank.API.Controllers;
 
@@ -11,36 +10,58 @@ public class TransactionController(ITransactionService transactionService) : Con
     [HttpPost("{accountId}/withdraw")]
     public async Task<IActionResult> WithdrawAccount(Guid accountId, [FromBody] decimal amount)
     {
-        if (amount <= 0) return BadRequest("O valor do saque deve ser maior que zero.");
-        
-        var success = await transactionService.WithdrawAccountAsync(accountId, amount);
-        return success ? Ok(new { Message = "Saque realizado com sucesso!" }) : BadRequest("Saldo insuficiente ou conta não encontrada");
+        try
+        {
+            var balance = await transactionService.WithdrawAccountAsync(accountId, amount);
+            return Ok(new { Message = $"Saque realizado com sucesso! O saldo atual é de: R${balance}" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("{accountId}/deposit")]
     public async Task<IActionResult> DepositAccount(Guid accountId, [FromBody] decimal amount)
     {
-        var success = await transactionService.DepositAccountAsync(accountId, amount);
-        return success ? Ok(new { Message = "Depósito realizado com sucesso!" }) : BadRequest("Conta não encontrada");
+        try
+        {
+            var balance = await transactionService.DepositAccountAsync(accountId, amount);
+            return Ok(new { Message = $"Depósito realizado com sucesso! O saldo atual é de: R${balance}" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("{sourceAccountId}/transfer/{destinationAccountId}")]
     public async Task<IActionResult> TransferAccount(Guid sourceAccountId, Guid destinationAccountId,
         [FromBody] decimal amount)
     {
-        if (sourceAccountId == destinationAccountId) return BadRequest("Não é possível transferir para a mesma conta.");
-        if (amount <= 0) return BadRequest("O valor da transferência deve ser maior que zero.");
-        
-        var success = await transactionService.TransferAccountAsync(sourceAccountId, destinationAccountId, amount);
-        return success
-            ? Ok(new { Message = "Transferência realizada com sucesso!" })
-            : BadRequest("Transferência falhou. Verifique as contas e o saldo.");
+        try
+        {
+            var (sourceBalance, destinationBalance) = await transactionService.TransferAccountAsync(sourceAccountId, destinationAccountId, amount);
+            return Ok(new { Message = $"Transferência realizado com sucesso! O saldo atual da conta de origem ({sourceAccountId}) é de: R${sourceBalance} " +
+                                      $"e da conta destino ({destinationAccountId}) é de R${destinationBalance}" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("{accountId}/statement")]
     public async Task<IActionResult> GetStatement(Guid accountId)
     {
-        var transactions = await transactionService.GetStatementAsync(accountId);
-        return Ok(transactions);
+        try
+        {
+            var transactions = await transactionService.GetStatementAsync(accountId);
+            return Ok(transactions);
+        }
+        catch
+        {
+            return BadRequest("Ocorreu um erro ao carregar os extratos, por favor tente novamente.");
+        }
     }
 }

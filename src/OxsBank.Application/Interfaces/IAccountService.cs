@@ -1,11 +1,11 @@
-using OxsBank.Application.Models;
+using OxsBank.Application.DTOs;
 
 namespace OxsBank.Application.Interfaces;
 
 public interface IAccountService
 {
-    Task<AccountModels.Account> CreateAccountAsync(AccountModels.CreateAccount model);
-    Task<AccountModels.Account> GetAccountByIdAsync(Guid id);
-    Task<List<AccountModels.Account>>GetAllAccountsAsync();
+    Task<AccountDto.Account> CreateAccountAsync(AccountDto.CreateAccount dto);
+    Task<AccountDto.Account> GetAccountByIdAsync(Guid id);
+    Task<List<AccountDto.Account>>GetAllAccountsAsync();
     Task<bool> DeleteAccountAsync(Guid id);
 }

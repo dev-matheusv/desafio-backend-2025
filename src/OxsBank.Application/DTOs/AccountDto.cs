@@ -1,16 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OxsBank.Application.Models;
+namespace OxsBank.Application.DTOs;
 
-public abstract class AccountModels
+public abstract class AccountDto
 {
     public class CreateAccount
     {
-        [Required]
+        [Required(ErrorMessage = "CNPJ inválido ou não encontrado.")]
         [MaxLength(18, ErrorMessage = "O CNPJ deve ter no máximo 18 caractéres.")]
         public string Cnpj { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "O documento precisa ser informado no formato base64.")]
         public string DocumentImage { get; set; } = null!;
     }
     

@@ -1,6 +1,6 @@
-namespace OxsBank.Application.Models;
+namespace OxsBank.Application.DTOs;
 
-public class TransactionModels
+public class TransactionDto
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public decimal Amount { get; set; }
@@ -9,6 +9,6 @@ public class TransactionModels
     public Guid? DestinationAccountId { get; set; } // Para transferências
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    public AccountModels.Account Account { get; set; } = null!;
-    public AccountModels.Account? DestinationAccount { get; set; }
+    public AccountDto.Account Account { get; set; } = null!;
+    public AccountDto.Account? DestinationAccount { get; set; }
 }
