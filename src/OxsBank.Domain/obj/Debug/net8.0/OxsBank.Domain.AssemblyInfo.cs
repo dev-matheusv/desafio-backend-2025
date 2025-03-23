@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OxsBank.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13011eb860ec0b3953074602d156446454770f2d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38bbc47b6abcf127bb734e396d4a627c8670459c")]
 [assembly: System.Reflection.AssemblyProductAttribute("OxsBank.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OxsBank.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

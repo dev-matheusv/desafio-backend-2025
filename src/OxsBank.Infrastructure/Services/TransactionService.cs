@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OxsBank.Application.DTOs;
 using OxsBank.Application.Interfaces;
 using OxsBank.Domain.Entities;
@@ -6,84 +7,182 @@ using OxsBank.Infrastructure.Persistence;
 
 namespace OxsBank.Infrastructure.Services;
 
-public class TransactionService(OxsBankDbContext context) : ITransactionService
+public class TransactionService(OxsBankDbContext context, ILogger<TransactionService> logger) : ITransactionService
 {
     // Método de Saque
-    public async Task<decimal> WithdrawAccountAsync(Guid accountId, decimal amount)
+    public async Task<TransactionDto> WithdrawAccountAsync(Guid accountId, decimal amount)
     {
+        logger.LogInformation("Efetuando saque no valor de R${amount}, na conta: {accountId}", amount, accountId);
+
         if (amount <= 0)
+        {
+            logger.LogWarning("Tentativa de efetuar saque de um valor menor que zero. valor: R${amount}, conta: {accountId}", amount, accountId);
             throw new Exception("O valor do saque deve ser maior que zero.");
+        }
         
         var account = await context.Accounts.FindAsync(accountId);
-        if (account == null) 
-            throw new Exception("Conta não encontrada.");
-        
-        if (account.Balance < amount) 
-            throw new Exception("Saldo insuficiente para efetuar o saque."); // verifica se o saldo é suficiente
-        
-        account.Balance -= amount;
-        var transaction = new Transaction
+        if (account == null)
         {
-            Id = Guid.NewGuid(),
-            Amount = amount,
-            Type = "Withdraw",
-            AccountId = account.Id,
-        };
-        
-        context.Transactions.Add(transaction);
-        await context.SaveChangesAsync();
+            logger.LogWarning("Tentativa de efetuar saque em conta não encontrada. Conta: {accountId}", accountId);
+            throw new Exception("Conta não encontrada.");
+        }
 
-        return account.Balance;
+        if (account.Balance < amount)
+        {
+            logger.LogWarning("Tentativa de efetuar saque para conta com valor insuficiente. Conta: {accountId}, valor do saque: R${amount}", accountId, amount);
+            throw new Exception("Saldo insuficiente para efetuar o saque."); // verifica se o saldo é suficiente
+        }
+
+        try
+        {
+            account.Balance -= amount;
+            var transaction = new Transaction
+            {
+                Id = Guid.NewGuid(),
+                Amount = amount,
+                Type = "Withdraw",
+                AccountId = account.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+        
+            context.Transactions.Add(transaction);
+            await context.SaveChangesAsync();
+
+            logger.LogInformation("Saque efetuado com sucesso! Conta: {accountId}, valor do saque: R${amount}", account.Id, amount);
+            return new TransactionDto
+            {
+                Id = transaction.Id,
+                Amount = transaction.Amount,
+                Type = transaction.Type,
+                AccountId = transaction.AccountId,
+                CreatedAt = transaction.CreatedAt,
+                Account = new AccountDto.Account
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    Cnpj = account.Cnpj,
+                    AccountNumber = account.AccountNumber,
+                    Agency = account.Agency,
+                    Balance = account.Balance
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao efetuar saque para a conta: {accountId}, no valor de: R${amount}", accountId, amount);
+            throw;
+        }
     }
     
     // Método de Depósito
-    public async Task<decimal> DepositAccountAsync(Guid accountId, decimal amount)
+    public async Task<TransactionDto> DepositAccountAsync(Guid accountId, decimal amount)
     {
+        logger.LogInformation("Efetuando depósito no valor de R${amount}, na conta: {accountId}", amount, accountId);
+        
         if (amount <= 0)
+        {
+            logger.LogWarning("Tentativa de efetuar o depósito de um valor menor que zero. valor: R${amount}, conta: {accountId}", amount, accountId);
             throw new Exception("O valor do depósito deve ser maior que zero.");
+        }
         
         var account = await context.Accounts.FindAsync(accountId);
-        if (account == null) 
-            throw new Exception("Conta não encontrada.");
-        
-        account.Balance += amount;
-        var transaction = new Transaction
+        if (account == null)
         {
-            Id = Guid.NewGuid(),
-            Amount = amount,
-            Type = "Deposit",
-            AccountId = account.Id,
-        };
+            logger.LogWarning("Tentativa de efetuar um depósito em conta não encontrada. Conta: {accountId}", accountId);
+            throw new Exception("Conta não encontrada.");
+        }
+
+        try
+        {
+            account.Balance += amount;
+            var transaction = new Transaction
+            {
+                Id = Guid.NewGuid(),
+                Amount = amount,
+                Type = "Deposit",
+                AccountId = account.Id,
+                CreatedAt = DateTime.UtcNow
+            };
         
-        context.Transactions.Add(transaction);
-        await context.SaveChangesAsync();
+            context.Transactions.Add(transaction);
+            await context.SaveChangesAsync();
         
-        return account.Balance;
+            logger.LogInformation("Depósito efetuado com sucesso! Conta: {accountId}, valor do saque: R${amount}", account.Id, amount);
+            return new TransactionDto
+            {
+                Id = transaction.Id,
+                Amount = transaction.Amount,
+                Type = transaction.Type,
+                AccountId = transaction.AccountId,
+                CreatedAt = transaction.CreatedAt,
+                Account = new AccountDto.Account
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    Cnpj = account.Cnpj,
+                    AccountNumber = account.AccountNumber,
+                    Agency = account.Agency,
+                    Balance = account.Balance
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao efetuar um depósito para a conta: {accountId}, no valor de: R${amount}", accountId, amount);
+            throw;
+        }
     }
     
     // Método de transferência
-    public async Task<(decimal sourceBalance, decimal destinationBalance)> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId, decimal amount)
+    public async Task<TransactionDto> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId,
+        decimal amount)
     {
         using (var transaction = await context.Database.BeginTransactionAsync())
         {
+            logger.LogInformation("Efetuando transferência da conta: {sourceAccountId}, para a conta: {" +
+                                  "destinationAccountId} no valor de R${amount}", sourceAccountId, destinationAccountId, amount);
+            
             if (sourceAccountId == destinationAccountId)
+            {
+                logger.LogWarning("Tentativa de efetuar transferência para a mesma conta: {sourceAccountId}", sourceAccountId);
                 throw new Exception("Não é possível transferir para a mesma conta.");
+            }
                 
-            if (amount <= 0) 
+            if (amount <= 0)
+            {
+                logger.LogWarning("Tentativa de efetuar transferência de um valor menor ou igual a zero. Valor: R${amount}", amount);
                 throw new Exception("O valor da transferência deve ser maior que zero.");
+            }
                 
             var sourceAccount = await context.Accounts.FindAsync(sourceAccountId);
             var destinationAccount = await context.Accounts.FindAsync(destinationAccountId);
 
             switch (sourceAccount, destinationAccount)
             {
-                case (null, null): throw new Exception("Ambas as contas não encontradas.");
-                case (null, _): throw new Exception("Conta de origem não encontrada.");  
-                case (_, null): throw new Exception("Conta de destino não encontrada.");
+                case (null, null):
+                {
+                    logger.LogWarning("Tentativa de efetuar transferência, onde as contas: {sourceAccountId} e " +
+                                      "{destinationAccountId} não foram encontradas.", sourceAccountId, destinationAccountId);
+                    throw new Exception("Ambas as contas não encontradas.");
+                }
+                case (null, _):
+                {
+                    logger.LogWarning("Tentativa de efetuar transferência, onde a conta de origem: {sourceAccountId} não foi encontrada.", sourceAccountId);
+                    throw new Exception("Conta de origem não encontrada.");
+                }  
+                case (_, null):
+                {
+                    logger.LogWarning("Tentativa de efetuar transferência, onde a conta de destino: {destinationAccountId} não foi encontrada.", destinationAccountId);
+                    throw new Exception("Conta de destino não encontrada.");
+                }
             }
-                
-            if (sourceAccount.Balance < amount) 
+
+            if (sourceAccount.Balance < amount)
+            {
+                logger.LogWarning("Tentativa de efetuar transferência com valor insuficiente. Conta: {sourceAccountId}, valor do saque: R${amount}", sourceAccountId, amount);
                 throw new Exception("Saldo insuficiente para efetuar a transferência."); // Verifica se o saldo é suficiente
+            }
+
             try
             {
                 sourceAccount.Balance -= amount;
@@ -94,6 +193,7 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
                     Id = Guid.NewGuid(),
                     Amount = amount,
                     Type = "Transfer",
+                    CreatedAt = DateTime.UtcNow,
                     AccountId = sourceAccount.Id,
                     DestinationAccountId = destinationAccountId
                 };
@@ -103,6 +203,7 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
                     Id = Guid.NewGuid(),
                     Amount = amount,
                     Type = "Transfer",
+                    CreatedAt = DateTime.UtcNow,
                     AccountId = destinationAccount.Id,
                     DestinationAccountId = sourceAccountId
                 };
@@ -113,18 +214,49 @@ public class TransactionService(OxsBankDbContext context) : ITransactionService
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return (sourceAccount.Balance, destinationAccount.Balance);
+                logger.LogInformation("Transferência efetuada com sucesso! Conta de origem: {sourceAccountId}, conta de destino: " +
+                                      "{destinationAccountId}, valor do saque: R${amount}", sourceAccountId, destinationAccountId, amount);
+                
+                return new TransactionDto
+                {
+                    Id = transactionSource.Id,
+                    Amount = transactionSource.Amount,
+                    Type = transactionSource.Type,
+                    AccountId = transactionSource.AccountId,
+                    Account = new AccountDto.Account
+                    {
+                        Id = sourceAccount.Id,
+                        Name = sourceAccount.Name,
+                        Cnpj = sourceAccount.Cnpj,
+                        AccountNumber = sourceAccount.AccountNumber,
+                        Agency = sourceAccount.Agency,
+                        Balance = sourceAccount.Balance
+                    },
+                    DestinationAccountId = transactionDestination.Id,
+                    DestinationAccount = new AccountDto.Account
+                    {
+                        Id = destinationAccount.Id,
+                        Name = destinationAccount.Name,
+                        Cnpj = destinationAccount.Cnpj,
+                        AccountNumber = destinationAccount.AccountNumber,
+                        Agency = destinationAccount.Agency,
+                        Balance = destinationAccount.Balance
+                    }
+                };
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                logger.LogError(ex, "Erro ao efetuar transferência da conta: {sourceAccountId}, para a conta: " +
+                                    "{destinationAccountId}, no valor de: R${amount}", sourceAccountId, destinationAccountId, amount);
+                
                 throw new Exception("Ocorreu um erro ao concluir a transação, por favor tente novamente.");
             }
         }
     }
     
     // Método de Extrato
-    public async Task<List<TransactionDto>> GetStatementAsync(Guid accountId)
+    public async Task<IEnumerable<TransactionDto>> GetStatementAsync(Guid accountId)
     {
         var transactions = await context.Transactions
             .Include(t => t.Account)  // Carrega a conta associada à transação

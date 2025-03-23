@@ -5,8 +5,8 @@ namespace OxsBank.Application.Interfaces;
 
 public interface ITransactionService
 {
-    Task<decimal> WithdrawAccountAsync(Guid accountId, decimal amount);
-    Task<decimal> DepositAccountAsync(Guid accountId, decimal amount);
-    Task<(decimal sourceBalance, decimal destinationBalance)> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId, decimal amount);
-    Task<List<TransactionDto>> GetStatementAsync(Guid accountId);
+    Task<TransactionDto> WithdrawAccountAsync(Guid accountId, decimal amount);
+    Task<TransactionDto> DepositAccountAsync(Guid accountId, decimal amount);
+    Task<TransactionDto> TransferAccountAsync(Guid sourceAccountId, Guid destinationAccountId, decimal amount);
+    Task<IEnumerable<TransactionDto>> GetStatementAsync(Guid accountId);
 }

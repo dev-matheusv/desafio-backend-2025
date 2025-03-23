@@ -5,18 +5,21 @@ namespace OxsBank.API.Controllers;
 
 [ApiController]
 [Route("api/transactions")]
-public class TransactionController(ITransactionService transactionService) : ControllerBase
+public class TransactionController(ITransactionService transactionService, ILogger<TransactionController> logger) : ControllerBase
 {
     [HttpPost("{accountId}/withdraw")]
     public async Task<IActionResult> WithdrawAccount(Guid accountId, [FromBody] decimal amount)
     {
         try
         {
-            var balance = await transactionService.WithdrawAccountAsync(accountId, amount);
-            return Ok(new { Message = $"Saque realizado com sucesso! O saldo atual é de: R${balance}" });
+            logger.LogInformation("Recebida requisição para efetuar o saque da conta: {accountId} no valor de: R${amount}", accountId, amount);
+            
+            var transaction = await transactionService.WithdrawAccountAsync(accountId, amount);
+            return Ok(new { Message = $"Saque no valor de R$:{amount} realizado com sucesso! O saldo atual é de: R${transaction.Account.Balance}" });
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Erro ao efetuar saque para a conta: {accountId}, no valor de: R${amount}", accountId, amount);
             return BadRequest(ex.Message);
         }
     }
@@ -26,11 +29,14 @@ public class TransactionController(ITransactionService transactionService) : Con
     {
         try
         {
-            var balance = await transactionService.DepositAccountAsync(accountId, amount);
-            return Ok(new { Message = $"Depósito realizado com sucesso! O saldo atual é de: R${balance}" });
+            logger.LogInformation("Recebida requisição para efetuar o depósito para a conta: {accountId} no valor de: R${amount}", accountId, amount);
+            
+            var transaction = await transactionService.DepositAccountAsync(accountId, amount);
+            return Ok(new { Message = $"Depósito no valor de R$:{amount} realizado com sucesso! O saldo atual é de: R${transaction.Account.Balance}" });
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Erro ao efetuar um depósito para a conta: {accountId}, no valor de: R${amount}", accountId, amount);
             return BadRequest(ex.Message);
         }
     }
@@ -41,12 +47,18 @@ public class TransactionController(ITransactionService transactionService) : Con
     {
         try
         {
-            var (sourceBalance, destinationBalance) = await transactionService.TransferAccountAsync(sourceAccountId, destinationAccountId, amount);
-            return Ok(new { Message = $"Transferência realizado com sucesso! O saldo atual da conta de origem ({sourceAccountId}) é de: R${sourceBalance} " +
-                                      $"e da conta destino ({destinationAccountId}) é de R${destinationBalance}" });
+            logger.LogInformation("Recebida requisição para efetuar a transferência da conta: {sourceAccountId}, para a conta: " +
+                                  "{destinationAccountId}, no valor de: R${amount}", sourceAccountId, destinationAccountId, amount);
+            
+            var transactions = await transactionService.TransferAccountAsync(sourceAccountId, destinationAccountId, amount);
+            return Ok(new { Message = $"Transferência realizada com sucesso! O saldo atual da conta de origem ({sourceAccountId}) é de: R${transactions.Account.Balance} " +
+                                      $"e da conta destino ({destinationAccountId}) é de R${transactions.DestinationAccount!.Balance}", transactions });
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Erro ao efetuar transferência da conta: {sourceAccountId}, para a conta: " +
+                                "{destinationAccountId}, no valor de: R${amount}", sourceAccountId, destinationAccountId, amount);
+            
             return BadRequest(ex.Message);
         }
     }
@@ -56,11 +68,13 @@ public class TransactionController(ITransactionService transactionService) : Con
     {
         try
         {
+            logger.LogInformation("Recebida requisição para consultar o extrato da conta: {accountId}", accountId);
             var transactions = await transactionService.GetStatementAsync(accountId);
             return Ok(transactions);
         }
-        catch
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Erro ao consultar o extrado da conta: {accountId}", accountId);
             return BadRequest("Ocorreu um erro ao carregar os extratos, por favor tente novamente.");
         }
     }

@@ -1,9 +1,11 @@
+using System.Net;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OxsBank.Application.Interfaces;
 
 namespace OxsBank.Infrastructure.Services;
 
-public class ReceitaWsService(HttpClient httpClient) : IReceitaWsService
+public class ReceitaWsService(HttpClient httpClient, ILogger<ReceitaWsService> logger) : IReceitaWsService
 {
     private const string ReceitaWsUrl = "https://receitaws.com.br/v1/cnpj";  // URL da API ReceitaWS
 
@@ -13,10 +15,11 @@ public class ReceitaWsService(HttpClient httpClient) : IReceitaWsService
         {
             var response = await httpClient.GetAsync($"{ReceitaWsUrl}/{cnpj}");
 
-            if (!response.IsSuccessStatusCode)
+            // Se o código retornado for 429 é porque excedeu o limite de consultas por minuto
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                // Caso a resposta não seja 200 OK, podemos lançar uma exceção ou retornar null
-                return null;
+                logger.LogWarning("Falha ao realizar a consulta pelo CNPJ, pois foi excedido o limite da API de 3 consultas por minuto.");
+                throw new Exception("Não foi possível realizar a consulta pelo CNPJ, pois foi excedido o limite da API de 3 consultas por minuto. Aguarde 1 minuto e crie a conta novamente.");
             }
 
             var content = await response.Content.ReadAsStringAsync();

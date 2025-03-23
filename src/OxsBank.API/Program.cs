@@ -1,8 +1,16 @@
 using OxsBank.Application.Interfaces;
 using OxsBank.Infrastructure.Configurations;
 using OxsBank.Infrastructure.Services;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("/logs/log.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // Adiciona os serviços do banco de dados
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
