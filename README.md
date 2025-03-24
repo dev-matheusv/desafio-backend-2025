@@ -1,42 +1,140 @@
-# Desafio Desenvolvedor Backend .NET
+# OxsBank
 
-## Definições
+O **OxsBank** é uma API bancária desenvolvida para gerenciar contas empresariais e realizar transações financeiras de forma segura e eficiente. A criação de contas é restrita a empresas, exigindo um CNPJ válido e um documento em base64.
 
-- Leia todo o conteúdo antes de iniciar e busque entender de fato o desafio proposto.
-- Faça um clone desse repositório para iniciar o projeto. Lembre-se de deixar o seu repositório privado e compartilhar com a conta do GitHub [MarcosVRSDev](https://github.com/MarcosVRSDev).
-- Utilizar o .Net na sua versão 5 ou superior.
+## Funcionalidades
 
-## Desafio
+- **Criação de Contas Empresariais**: Apenas empresas podem criar contas, sendo necessário informar um CNPJ e um documento em base64.
+- **Gerenciamento de Contas**:
+  - Criar conta (consulta automática na API ReceitaWS).
+  - Listar todas as contas.
+  - Consultar conta por ID (formato GUID).
+  - Excluir conta.
+- **Transações Bancárias**:
+  - Depósitos.
+  - Saques.
+  - Transferências entre contas.
+  - Consulta de saldo e extrato.
 
-Criar uma API de conta bancária. Será somente possível cadastrar empresas por CNPJ.
+## Tecnologias Utilizadas
 
-## Orientações
+- **.NET 8**
+- **Entity Framework Core**
+- **PostgreSQL**
+- **Docker**
+- **Clean Architecture**
+- **API ReceitaWS** (consulta de dados da empresa pelo CNPJ)
+- **Swagger** (documentação e testes da API)
+- **Serilog** (logging estruturado)
+- **Autenticação JWT** (implementação planejada para o futuro)
 
-- Recursos:
-  - Conta bancária (CRUD).
-  - Saque.
-  - Depósito.
-  - Transações (Uma conta para outra).
-  - Retornar saldo e extrato.
+## Configuração do Ambiente
 
-- Sugestão de tabelas:
-  - **Conta**: Campos: (id, nome, CNPJ, número da conta, agência e imagem do documento)
-  - **Transações**: Campos: (id, valor, tipo, conta_id)
+### 1. Requisitos
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Docker](https://www.docker.com/get-started)
+- [PostgreSQL](https://www.postgresql.org/download/)
 
-## Informações Adicionais
+### 2. Clonar o Repositório
+```bash
+git clone https://github.com/dev-matheusv/desafio-backend-2025.git
+cd desafio-backend-2025
+```
 
-- Utilizar padrão REST, Postgres ou MySQL, e efetuar todas as validações necessárias.
-- Ao realizar a abertura da conta, o nome da empresa não vai poder ser informado na model, deve ser obtido através da API pelo CNPJ informado. [ReceitaWS API](https://developers.receitaws.com.br/#/operations/queryCNPJFree) (Atenção ao limite, tem um nível gratuito, tratar erros).
-- O documento da conta pode ser uma foto aleatória, fica a critério a forma de envio (Base64 ou MultipartFormData) salvar fisicamente em um diretório.
+### 3. Configurar o Banco de Dados
+- Se estiver rodando localmente, crie um banco de dados `oxsbankdb`.
+- Atualize o `appsettings.json` com as credenciais corretas:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Database=oxsbankdb;Username=seu_usuario;Password=sua_senha"
+}
+```
 
-## O que será Avaliado
+### 4. Executar com Docker
+```bash
+docker-compose up
+```
+Isso iniciará a API e o banco de dados PostgreSQL.
 
-- Implementação dos recursos solicitados.
-- Validações e tratamento de erros.
-- Organização do código e estrutura do projeto.
-- Uso adequado das tecnologias mencionadas (REST, banco de dados, .Net 5+).
-- Clareza e qualidade do código.
-- Uso de boas práticas de desenvolvimento.
-- Documentação do projeto.
+### 5. Aplicar Migrações do EF Core
+```bash
+dotnet ef database update
+```
 
-Qualquer dúvida pode ser enviada para o e-mail: marcos.rezende@inovamobil.com.br
+### 6. Acessar a API
+- API: `http://localhost:5000`
+- Swagger: `http://localhost:5000/swagger`
+
+## Testando a API
+
+### Criar Conta (Somente CNPJ Válido)
+```bash
+curl -X POST http://localhost:5000/api/accounts -H "Content-Type: application/json" -d '{
+  "cnpj": "12345678000195",
+  "documentoBase64": "dGVzdGU=..."
+}'
+```
+A API consultará automaticamente os dados da empresa na ReceitaWS.
+
+### Consultar Conta por ID (Formato GUID)
+```bash
+curl -X GET http://localhost:5000/api/accounts/{id}
+```
+
+### Listar Todas as Contas
+```bash
+curl -X GET http://localhost:5000/api/accounts
+```
+
+### Excluir Conta
+```bash
+curl -X DELETE http://localhost:5000/api/accounts/{id}
+```
+
+### Depositar
+```bash
+curl -X POST http://localhost:5000/api/transactions/deposit -H "Content-Type: application/json" -d '{
+  "contaId": "guid-da-conta",
+  "valor": 1000.00
+}'
+```
+
+### Sacar
+```bash
+curl -X POST http://localhost:5000/api/transactions/withdraw -H "Content-Type: application/json" -d '{
+  "contaId": "guid-da-conta",
+  "valor": 500.00
+}'
+```
+
+### Transferir
+```bash
+curl -X POST http://localhost:5000/api/transactions/transfer -H "Content-Type: application/json" -d '{
+  "contaOrigemId": "guid-origem",
+  "contaDestinoId": "guid-destino",
+  "valor": 200.00
+}'
+```
+
+### Consultar Saldo
+```bash
+curl -X GET http://localhost:5000/api/transactions/{id}/balance
+```
+
+### Consultar Extrato
+```bash
+curl -X GET http://localhost:5000/api/transactions/{id}/statement
+```
+
+## Contribuição
+
+1. Faça um fork do repositório.
+2. Crie uma nova branch: `git checkout -b minha-feature`
+3. Faça suas alterações e commit: `git commit -m "Adiciona nova funcionalidade"`
+4. Envie para o repositório remoto: `git push origin minha-feature`
+5. Abra um Pull Request.
+
+## Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE).
+
